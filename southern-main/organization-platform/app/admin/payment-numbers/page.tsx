@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { useAppStore } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -56,18 +57,15 @@ export default function PaymentNumbersPage() {
 
     try {
       if (editingNumber) {
-        const { error } = await (supabase
-          .from('payment_numbers') as any)
-          .update({
+        const { error } = await adminDb('payment_numbers').update({
             ...formData,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingNumber.id);
+          }).eq('id', editingNumber.id);
 
         if (error) throw error;
         showNotification('Payment number updated successfully', 'success');
       } else {
-        const { error } = await (supabase.from('payment_numbers') as any).insert(formData);
+        const { error } = await adminDb('payment_numbers').insert(formData);
 
         if (error) throw error;
         showNotification('Payment number created successfully', 'success');
@@ -86,7 +84,7 @@ export default function PaymentNumbersPage() {
     if (!confirm('Are you sure you want to delete this payment number?')) return;
 
     try {
-      const { error } = await (supabase.from('payment_numbers') as any).delete().eq('id', id);
+      const { error } = await adminDb('payment_numbers').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Payment number deleted successfully', 'success');
@@ -98,10 +96,7 @@ export default function PaymentNumbersPage() {
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await (supabase
-        .from('payment_numbers') as any)
-        .update({ is_active: !currentStatus })
-        .eq('id', id);
+      const { error } = await adminDb('payment_numbers').update({ is_active: !currentStatus }).eq('id', id);
 
       if (error) throw error;
       showNotification(`Payment number ${!currentStatus ? 'activated' : 'deactivated'}`, 'success');

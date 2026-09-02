@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import MediaRenderer from '@/components/MediaRenderer';
 import { supabase } from '@/lib/supabase/client';
 
 interface Slide {
@@ -68,11 +68,10 @@ export default function HelloSlides() {
         >
           <div className="relative w-full h-full">
             {slide.image_url ? (
-              <Image
+              <MediaRenderer
                 src={slide.image_url}
                 alt={slide.description || 'Slide image'}
                 fill
-                sizes="100vw"
                 className="object-cover"
                 priority={index === 0}
               />

@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
-import { Plus, Edit, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Edit, Trash2, ArrowUp, ArrowDown , Eye } from 'lucide-react';
+import MediaRenderer from '@/components/MediaRenderer';
+import MediaPreviewModal from '@/components/MediaPreviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import FileUpload from '@/components/FileUpload';
 import { useNotification } from '@/lib/store';
@@ -14,6 +17,7 @@ export default function SlidesManagement() {
   const [slides, setSlides] = useState<HelloSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const [editingSlide, setEditingSlide] = useState<HelloSlide | null>(null);
   const { showNotification } = useNotification();
 
@@ -50,22 +54,19 @@ export default function SlidesManagement() {
 
     try {
       if (editingSlide) {
-        const { error } = await (supabase
-          .from('hello_slides') as any)
-          .update({
+        const { error } = await adminDb('hello_slides').update({
             image_url: formData.image_url,
             description: formData.description,
             direction: formData.direction,
             is_active: formData.is_active,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingSlide.id);
+          }).eq('id', editingSlide.id);
 
         if (error) throw error;
         showNotification('Slide updated successfully', 'success');
       } else {
         const maxOrder = slides.length > 0 ? Math.max(...slides.map((s) => s.order_index)) : 0;
-        const { error } = await (supabase.from('hello_slides') as any).insert({
+        const { error } = await adminDb('hello_slides').insert({
           image_url: formData.image_url,
           description: formData.description,
           direction: formData.direction,
@@ -90,7 +91,7 @@ export default function SlidesManagement() {
     if (!confirm('Are you sure you want to delete this slide?')) return;
 
     try {
-      const { error } = await (supabase.from('hello_slides') as any).delete().eq('id', id);
+      const { error } = await adminDb('hello_slides').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Slide deleted successfully', 'success');
@@ -123,10 +124,7 @@ export default function SlidesManagement() {
       }));
 
       for (const update of updates) {
-        await (supabase
-          .from('hello_slides') as any)
-          .update({ order_index: update.order_index })
-          .eq('id', update.id);
+        await adminDb('hello_slides').update({ order_index: update.order_index }).eq('id', update.id);
       }
 
       showNotification('Slides reordered successfully', 'success');
@@ -181,11 +179,7 @@ export default function SlidesManagement() {
             key={slide.id}
             className="bg-white border rounded-lg p-4 flex items-center gap-4"
           >
-            <img
-              src={slide.image_url}
-              alt={slide.description || 'Slide'}
-              className="w-32 h-20 object-cover rounded"
-            />
+            <MediaRenderer src={slide.image_url} alt={slide.description || 'Slide'} className="w-32 h-20 object-cover rounded" isThumbnail />
             <div className="flex-1">
               <p className="font-medium">{slide.description || 'No description'}</p>
               <p className="text-sm text-gray-500">
@@ -208,6 +202,13 @@ export default function SlidesManagement() {
                 <ArrowDown className="w-5 h-5" />
               </button>
               <button
+                onClick={(e) => { e.stopPropagation(); setPreviewMedia((slide as any).image_url || (slide as any).media_url); }}
+                className="p-2 text-purple-600 hover:bg-purple-50 rounded"
+                title="Preview Media"
+              >
+                <Eye className="w-5 h-5" />
+              </button>
+              <button
                 onClick={() => openEditModal(slide)}
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded"
               >
@@ -223,6 +224,13 @@ export default function SlidesManagement() {
           </div>
         ))}
       </div>
+
+      {previewMedia && (
+        <MediaPreviewModal 
+          url={previewMedia} 
+          onClose={() => setPreviewMedia(null)} 
+        />
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

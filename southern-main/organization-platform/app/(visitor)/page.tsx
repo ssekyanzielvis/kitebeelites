@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import MediaRenderer from '@/components/MediaRenderer';
 import Link from 'next/link';
 import Image from 'next/image';
 import HelloSlides from '@/components/HelloSlides';
@@ -8,6 +9,7 @@ import ImageCard from '@/components/ImageCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { supabase } from '@/lib/supabase/client';
 import { ArrowRight } from 'lucide-react';
+import { useAppStore } from '@/lib/store';
 
 interface AboutContent {
   id: string;
@@ -64,6 +66,7 @@ interface GalleryImage {
 }
 
 export default function HomePage() {
+  const theme = useAppStore((state) => state.theme);
   const [loading, setLoading] = useState(true);
   const [about, setAbout] = useState<AboutContent[]>([]);
   const [vision, setVision] = useState<VisionMission | null>(null);
@@ -134,16 +137,14 @@ export default function HomePage() {
 
       {/* About Us Section */}
       {about.length > 0 && (
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">About Us</h2>
             <div className="relative w-[80vw] h-[80vh] mx-auto rounded-lg overflow-hidden shadow-2xl">
               {about[0].image_url && (
-                <Image
-                  src={about[0].image_url}
+                <MediaRenderer                   src={about[0].image_url}
                   alt="About Us"
                   fill
-                  sizes="80vw"
                   className="object-cover"
                 />
               )}
@@ -155,7 +156,8 @@ export default function HomePage() {
                   </p>
                   <Link
                     href="/about"
-                    className="inline-flex items-center text-white bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                    className="inline-flex items-center text-white px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: theme.primaryColor }}
                   >
                     Learn More <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
@@ -168,23 +170,21 @@ export default function HomePage() {
 
       {/* Vision Section */}
       {vision && (
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 bg-black/5">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Vision</h2>
             <div className="flex flex-col md:flex-row items-center gap-8 max-w-5xl mx-auto">
               {vision.image_url && (
                 <div className="relative w-full md:w-1/2 h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-                  <Image
-                    src={vision.image_url}
+                  <MediaRenderer                     src={vision.image_url}
                     alt="Our Vision"
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                   />
                 </div>
               )}
               <div className="w-full md:w-1/2">
-                <p className="text-xl text-gray-800 leading-relaxed italic">
+                <p className="text-xl leading-relaxed italic opacity-80">
                   "{vision.statement}"
                 </p>
               </div>
@@ -195,23 +195,21 @@ export default function HomePage() {
 
       {/* Mission Section */}
       {mission && (
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Mission</h2>
             <div className="flex flex-col md:flex-row items-center gap-8 max-w-5xl mx-auto">
               {mission.image_url && (
                 <div className="relative w-full md:w-1/2 h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-                  <Image
-                    src={mission.image_url}
+                  <MediaRenderer                     src={mission.image_url}
                     alt="Our Mission"
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                   />
                 </div>
               )}
               <div className="w-full md:w-1/2">
-                <p className="text-xl text-gray-800 leading-relaxed italic">
+                <p className="text-xl leading-relaxed italic opacity-80">
                   "{mission.statement}"
                 </p>
               </div>
@@ -222,24 +220,22 @@ export default function HomePage() {
 
       {/* Objectives Section */}
       {objectives.length > 0 && (
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 bg-black/5">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Objectives</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {objectives.map((objective) => (
-                <div key={objective.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div key={objective.id} className="rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow bg-white/5 border border-current border-opacity-10">
                   {objective.image_url && (
                     <div className="relative w-full h-48 mb-4 rounded overflow-hidden">
-                      <Image
-                        src={objective.image_url}
+                      <MediaRenderer                         src={objective.image_url}
                         alt="Objective"
                         fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
                         className="object-cover"
                       />
                     </div>
                   )}
-                  <p className="text-gray-700 leading-relaxed">{objective.statement}</p>
+                  <p className="leading-relaxed opacity-90">{objective.statement}</p>
                 </div>
               ))}
             </div>
@@ -249,7 +245,7 @@ export default function HomePage() {
 
       {/* Programs Section */}
       {programs.length > 0 && (
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Programs</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 max-w-7xl mx-auto">
@@ -265,7 +261,8 @@ export default function HomePage() {
             <div className="text-center">
               <Link
                 href="/programs"
-                className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                style={{ backgroundColor: theme.primaryColor }}
               >
                 View All Programs <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -276,7 +273,7 @@ export default function HomePage() {
 
       {/* Achievements Section */}
       {achievements.length > 0 && (
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 bg-black/5">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Achievements</h2>
             <div className="grid grid-cols-1 gap-8 mb-8 max-w-3xl mx-auto">
@@ -290,7 +287,8 @@ export default function HomePage() {
             <div className="text-center">
               <Link
                 href="/achievements"
-                className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                style={{ backgroundColor: theme.primaryColor }}
               >
                 View All Achievements <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -301,7 +299,7 @@ export default function HomePage() {
 
       {/* Core Values Section */}
       {coreValues.length > 0 && (
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Core Values</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 max-w-7xl mx-auto">
@@ -317,7 +315,8 @@ export default function HomePage() {
             <div className="text-center">
               <Link
                 href="/core-values"
-                className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                style={{ backgroundColor: theme.primaryColor }}
               >
                 View All Values <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -328,19 +327,21 @@ export default function HomePage() {
 
       {/* Gallery Section */}
       {gallery.length > 0 && (
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 bg-black/5">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Gallery</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
               {gallery.map((image) => (
                 <div key={image.id} className="relative aspect-square group overflow-hidden rounded-lg">
-                  <Image
-                    src={image.image_url}
-                    alt={image.description || 'Gallery image'}
-                    fill
-                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
+                  {image.image_url ? (
+                    <MediaRenderer                       src={image.image_url}
+                      alt={image.description || 'Gallery image'}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-green-800 to-green-700 transition-transform duration-300 group-hover:scale-110" />
+                  )}
                   {image.description && (
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
                       <p className="text-white text-center text-sm">{image.description}</p>
@@ -352,7 +353,8 @@ export default function HomePage() {
             <div className="text-center">
               <Link
                 href="/gallery"
-                className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                style={{ backgroundColor: theme.primaryColor }}
               >
                 View Full Gallery <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -363,7 +365,7 @@ export default function HomePage() {
 
       {/* News Section */}
       {news.length > 0 && (
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4">
           <div className="container mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Latest News</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
@@ -379,7 +381,8 @@ export default function HomePage() {
             <div className="text-center">
               <Link
                 href="/news"
-                className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                style={{ backgroundColor: theme.primaryColor }}
               >
                 View All News <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -389,15 +392,16 @@ export default function HomePage() {
       )}
 
       {/* Call to Action - Donate */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-black/5">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Make a Difference Today</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto text-gray-700">
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-80">
             Your support helps us continue our mission to create positive change in our community.
           </p>
           <Link
             href="/donate"
-            className="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-bold text-lg shadow-lg hover:shadow-xl"
+            className="inline-flex items-center text-white px-8 py-4 rounded-lg hover:opacity-90 transition-opacity font-bold text-lg shadow-lg hover:shadow-xl"
+            style={{ backgroundColor: theme.primaryColor }}
           >
             Donate Now <ArrowRight className="ml-2 w-6 h-6" />
           </Link>
@@ -406,4 +410,3 @@ export default function HomePage() {
     </div>
   );
 }
-

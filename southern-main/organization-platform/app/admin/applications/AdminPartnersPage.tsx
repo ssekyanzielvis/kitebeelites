@@ -1,4 +1,5 @@
 "use client";
+import { adminDb } from '@/lib/supabase/adminDb';
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -36,14 +37,14 @@ export default function AdminPartnersPage() {
     const appData = partnerApps.find((a) => a.id === id);
     if (!appData) return;
     const { is_approved, ...cleanData } = appData;
-    await supabase.from("partners").insert({ ...cleanData, is_active: true, created_at: new Date().toISOString() });
+    await adminDb('partners').insert({ ...cleanData, is_active: true, created_at: new Date().toISOString() });
     await (supabase.from("partner_applications") as any).update({ is_approved: true }).eq("id", id);
     await fetchPartners();
     setProcessingId(null);
   };
 
   const registerDirect = async (data: any) => {
-    await supabase.from("partners").insert({ ...data, is_active: true, created_at: new Date().toISOString() });
+    await adminDb('partners').insert({ ...data, is_active: true, created_at: new Date().toISOString() });
     await fetchPartners();
   };
 

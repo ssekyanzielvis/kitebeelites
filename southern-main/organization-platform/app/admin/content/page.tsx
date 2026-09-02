@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
 import { Save, Image as ImageIcon, Edit, Trash2 } from 'lucide-react';
+import MediaRenderer from '@/components/MediaRenderer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import FileUpload from '@/components/FileUpload';
 import { useNotification } from '@/lib/store';
@@ -76,18 +78,15 @@ export default function ContentManagement() {
     setLoading(true);
     try {
       if (vision) {
-        const { error } = await (supabase
-          .from('vision') as any)
-          .update({
+        const { error } = await adminDb('vision').update({
             statement: visionForm.statement,
             image_url: visionForm.image_url,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', vision.id);
+          }).eq('id', vision.id);
 
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from('vision') as any).insert(visionForm);
+        const { error } = await adminDb('vision').insert(visionForm);
 
         if (error) throw error;
       }
@@ -105,18 +104,15 @@ export default function ContentManagement() {
     setLoading(true);
     try {
       if (mission) {
-        const { error } = await (supabase
-          .from('mission') as any)
-          .update({
+        const { error } = await adminDb('mission').update({
             statement: missionForm.statement,
             image_url: missionForm.image_url,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', mission.id);
+          }).eq('id', mission.id);
 
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from('mission') as any).insert(missionForm);
+        const { error } = await adminDb('mission').insert(missionForm);
 
         if (error) throw error;
       }
@@ -137,21 +133,18 @@ export default function ContentManagement() {
     try {
       if (editingAboutId) {
         // Update existing about section
-        const { error } = await (supabase
-          .from('about_us') as any)
-          .update({
+        const { error } = await adminDb('about_us').update({
             description: aboutForm.description,
             image_url: aboutForm.image_url,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingAboutId);
+          }).eq('id', editingAboutId);
 
         if (error) throw error;
         showNotification('About section updated successfully', 'success');
       } else {
         // Add new about section
         const maxOrder = aboutItems.length > 0 ? Math.max(...aboutItems.map((a) => a.order_index)) : 0;
-        const { error } = await (supabase.from('about_us') as any).insert({
+        const { error } = await adminDb('about_us').insert({
           description: aboutForm.description,
           image_url: aboutForm.image_url,
           order_index: maxOrder + 1,
@@ -186,7 +179,7 @@ export default function ContentManagement() {
     if (!confirm('Delete this about section?')) return;
 
     try {
-      const { error } = await (supabase.from('about_us') as any).delete().eq('id', id);
+      const { error } = await adminDb('about_us').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('About section deleted', 'success');
@@ -203,14 +196,11 @@ export default function ContentManagement() {
     try {
       if (editingObjectiveId) {
         // Update existing objective
-        const { error } = await (supabase
-          .from('objectives') as any)
-          .update({
+        const { error } = await adminDb('objectives').update({
             statement: objectiveForm.statement,
             image_url: objectiveForm.image_url,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingObjectiveId);
+          }).eq('id', editingObjectiveId);
 
         if (error) throw error;
         showNotification('Objective updated successfully', 'success');
@@ -218,7 +208,7 @@ export default function ContentManagement() {
         // Add new objective
         const maxOrder =
           objectives.length > 0 ? Math.max(...objectives.map((o) => o.order_index)) : 0;
-        const { error } = await (supabase.from('objectives') as any).insert({
+        const { error } = await adminDb('objectives').insert({
           statement: objectiveForm.statement,
           image_url: objectiveForm.image_url,
           order_index: maxOrder + 1,
@@ -253,7 +243,7 @@ export default function ContentManagement() {
     if (!confirm('Delete this objective?')) return;
 
     try {
-      const { error } = await (supabase.from('objectives') as any).delete().eq('id', id);
+      const { error } = await adminDb('objectives').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Objective deleted', 'success');
@@ -403,7 +393,7 @@ export default function ContentManagement() {
             {aboutItems.map((item) => (
               <div key={item.id} className="bg-white border rounded-lg p-4 flex gap-4">
                 {item.image_url && (
-                  <img src={item.image_url} alt="About" className="w-32 h-24 object-cover rounded" />
+                  <MediaRenderer src={item.image_url} alt="About" className="w-32 h-24 object-cover rounded" isThumbnail />
                 )}
                 <div className="flex-1">
                   <p className="text-gray-700">{item.description}</p>
@@ -478,7 +468,7 @@ export default function ContentManagement() {
             {objectives.map((obj) => (
               <div key={obj.id} className="bg-white border rounded-lg p-4 flex gap-4">
                 {obj.image_url && (
-                  <img src={obj.image_url} alt="Objective" className="w-24 h-24 object-cover rounded" />
+                  <MediaRenderer src={obj.image_url} alt="Objective" className="w-24 h-24 object-cover rounded" isThumbnail />
                 )}
                 <div className="flex-1">
                   <p className="text-gray-700">{obj.statement}</p>

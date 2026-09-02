@@ -49,7 +49,7 @@ export default function CoreValuesPage() {
     <div className="w-full py-16 px-4">
       <div className="container mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">Our Core Values</h1>
-        <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+        <p className="text-xl text-center mb-12 max-w-3xl mx-auto opacity-70">
           The principles that guide our work and define who we are.
         </p>
         
@@ -66,7 +66,7 @@ export default function CoreValuesPage() {
 
         {coreValues.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-500">No core values available at the moment.</p>
+            <p className="text-xl opacity-50">No core values available at the moment.</p>
           </div>
         )}
       </div>

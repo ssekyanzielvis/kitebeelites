@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
 import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import MediaRenderer from '@/components/MediaRenderer';
+import MediaPreviewModal from '@/components/MediaPreviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import FileUpload from '@/components/FileUpload';
 import { useNotification } from '@/lib/store';
@@ -14,6 +17,7 @@ export default function CoreValuesManagement() {
   const [coreValues, setCoreValues] = useState<CoreValue[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<CoreValue | null>(null);
   const { showNotification } = useNotification();
 
@@ -51,19 +55,16 @@ export default function CoreValuesManagement() {
 
     try {
       if (editingValue) {
-        const { error } = await (supabase
-          .from('core_values') as any)
-          .update({
+        const { error } = await adminDb('core_values').update({
             ...formData,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingValue.id);
+          }).eq('id', editingValue.id);
 
         if (error) throw error;
         showNotification('Core value updated successfully', 'success');
       } else {
         const maxOrder = coreValues.length > 0 ? Math.max(...coreValues.map((v) => v.order_index)) : 0;
-        const { error } = await (supabase.from('core_values') as any).insert({
+        const { error } = await adminDb('core_values').insert({
           ...formData,
           order_index: maxOrder + 1,
         });
@@ -85,7 +86,7 @@ export default function CoreValuesManagement() {
     if (!confirm('Are you sure you want to delete this core value?')) return;
 
     try {
-      const { error } = await (supabase.from('core_values') as any).delete().eq('id', id);
+      const { error } = await adminDb('core_values').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Core value deleted successfully', 'success');
@@ -140,7 +141,7 @@ export default function CoreValuesManagement() {
         {coreValues.map((value) => (
           <div key={value.id} className="bg-white border rounded-lg overflow-hidden">
             {value.image_url && (
-              <img src={value.image_url} alt={value.title} className="w-full h-48 object-cover" />
+              <MediaRenderer src={value.image_url} alt={value.title} className="w-full h-48 object-cover" isThumbnail />
             )}
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
@@ -178,6 +179,13 @@ export default function CoreValuesManagement() {
         ))}
       </div>
 
+      {previewMedia && (
+        <MediaPreviewModal 
+          url={previewMedia} 
+          onClose={() => setPreviewMedia(null)} 
+        />
+      )}
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
@@ -208,9 +216,8 @@ export default function CoreValuesManagement() {
                 bucket="core-values"
                 currentUrl={formData.image_url}
                 onUploadComplete={(url) => setFormData({ ...formData, image_url: url })}
-                accept="image"
+                accept="both"
                 label="Core Value Image"
-                maxSizeMB={5}
               />
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">

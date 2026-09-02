@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
 import { Download, Eye, Trash2 } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -40,7 +41,7 @@ export default function ContactSubmissions() {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-      const { error } = await (supabase.from('contact_submissions') as any).delete().eq('id', id);
+      const { error } = await adminDb('contact_submissions').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Submission deleted successfully', 'success');

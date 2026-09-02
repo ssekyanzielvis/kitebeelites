@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
 import { Download, Eye, Trash2, Printer } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -54,7 +55,7 @@ export default function DonationsManagement() {
     if (!confirm('Are you sure you want to delete this donation?')) return;
 
     try {
-      const { error } = await (supabase.from('donations') as any).delete().eq('id', id);
+      const { error } = await adminDb('donations').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Donation deleted successfully', 'success');

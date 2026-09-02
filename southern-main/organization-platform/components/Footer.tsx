@@ -67,6 +67,17 @@ export default function Footer() {
                 <p className="text-sm opacity-90">{footerData.primary_focus}</p>
               )}
             </div>
+
+            <div className="mt-8">
+              <h3 className="text-lg font-bold mb-3">Community</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="/policies" className="text-sm hover:underline opacity-90 hover:opacity-100 flex items-center gap-2">
+                    Community Policies
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
 
           {/* Contact Information */}
@@ -120,11 +131,13 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2 mb-5">
               <li><a href="/about"        className="text-sm hover:underline">About Us</a></li>
-              <li><a href="/programs"     className="text-sm hover:underline">Our Pillars</a></li>
+              <li><a href="/programs"     className="text-sm hover:underline">Programs</a></li>
+              <li><a href="/leagues"      className="text-sm hover:underline">Leagues</a></li>
               <li><a href="/achievements" className="text-sm hover:underline">Achievements</a></li>
               <li><a href="/gallery"      className="text-sm hover:underline">Gallery</a></li>
               <li><a href="/news"         className="text-sm hover:underline">News</a></li>
               <li><a href="/leadership"   className="text-sm hover:underline">Leadership</a></li>
+              <li><a href="/core-values"  className="text-sm hover:underline">Core Values</a></li>
               <li><a href="/donate"       className="text-sm hover:underline font-semibold">Donate Now</a></li>
             </ul>
 

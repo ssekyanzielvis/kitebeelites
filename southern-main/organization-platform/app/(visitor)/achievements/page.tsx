@@ -52,7 +52,7 @@ export default function AchievementsPage() {
     <div className="w-full py-16 px-4">
       <div className="container mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">Our Achievements</h1>
-        <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+        <p className="text-xl text-center mb-12 max-w-3xl mx-auto opacity-70">
           Celebrating our milestones and the impact we've made together.
         </p>
         
@@ -65,7 +65,7 @@ export default function AchievementsPage() {
                 description={achievement.description}
               />
               <TruncatedText text={achievement.description} />
-              <p className="text-sm text-gray-500 text-center">
+              <p className="text-sm text-center opacity-60">
                 {formatDate(achievement.achievement_date)}
               </p>
             </div>
@@ -74,7 +74,7 @@ export default function AchievementsPage() {
 
         {achievements.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-500">No achievements available at the moment.</p>
+            <p className="text-xl opacity-50">No achievements available at the moment.</p>
           </div>
         )}
       </div>

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, FileVideo, Image as ImageIcon } from 'lucide-react';
 import { useNotification } from '@/lib/store';
+import { supabase } from '@/lib/supabase/client';
 
 interface FileUploadProps {
   bucket: string;
@@ -18,7 +19,7 @@ export default function FileUpload({
   onUploadComplete,
   currentUrl = '',
   accept = 'both',
-  maxSizeMB = 10,
+  maxSizeMB = 100,
   label = 'Upload File',
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
@@ -78,17 +79,24 @@ export default function FileUpload({
   const uploadFile = async (file: File) => {
     setUploading(true);
     try {
-      const form = new FormData();
-      form.append('file', file);
-      form.append('bucket', bucket);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+        
+      if (uploadError) throw uploadError;
 
-      const res = await fetch('/api/upload', { method: 'POST', body: form });
-      const result = await res.json();
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(fileName);
 
-      if (!res.ok) throw new Error(result.error || 'Upload failed');
-
-      setPreview(result.url);
-      onUploadComplete(result.url);
+      setPreview(publicUrl);
+      onUploadComplete(publicUrl);
       showNotification('File uploaded successfully', 'success');
     } catch (error: any) {
       console.error('Upload error:', error);

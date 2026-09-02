@@ -1,4 +1,5 @@
 "use client";
+import { adminDb } from '@/lib/supabase/adminDb';
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -25,14 +26,14 @@ export default function AdminStaffPage() {
     const appData = staffApps.find((a) => a.id === id);
     if (!appData) return;
     const { is_approved, ...cleanData } = appData;
-    await supabase.from("staff").insert({ ...cleanData, is_active: true, created_at: new Date().toISOString() });
+    await adminDb('staff').insert({ ...cleanData, is_active: true, created_at: new Date().toISOString() });
     await (supabase.from("staff_applications") as any).update({ is_approved: true }).eq("id", id);
     await fetchStaff();
     setProcessingId(null);
   };
 
   const registerDirect = async (data: any) => {
-    await supabase.from("staff").insert({ ...data, is_active: true, created_at: new Date().toISOString() });
+    await adminDb('staff').insert({ ...data, is_active: true, created_at: new Date().toISOString() });
     await fetchStaff();
   };
 

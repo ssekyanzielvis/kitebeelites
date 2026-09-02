@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase/client';
 
@@ -33,14 +33,38 @@ export default function Header() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/programs', label: 'Pillars' },
-    { href: '/achievements', label: 'Achievements' },
-    { href: '/gallery', label: 'Gallery' },
-    { href: '/news', label: 'News' },
-    { href: '/leadership', label: 'Leadership' },
+    { 
+      label: 'About', 
+      dropdown: [
+        { href: '/about', label: 'Who We Are' },
+        { href: '/leadership', label: 'Leadership' },
+        { href: '/core-values', label: 'Core Values' },
+      ]
+    },
+    { 
+      label: 'Programs',
+      dropdown: [
+        { href: '/programs', label: 'Our Programs' },
+        { href: '/charity-visits', label: 'Charity Visits' }
+      ]
+    },
+    { href: '/leagues', label: 'Leagues' },
+    { 
+      label: 'Media & News', 
+      dropdown: [
+        { href: '/achievements', label: 'Achievements' },
+        { href: '/gallery', label: 'Gallery' },
+        { href: '/news', label: 'News' },
+      ]
+    },
     { href: '/contact', label: 'Contact' },
-    { href: '/donate', label: 'Donate' },
+    { 
+      label: 'Donate', 
+      dropdown: [
+        { href: '/why-donate', label: 'Why We Donate' },
+        { href: '/donate', label: 'Donate Now' },
+      ]
+    },
   ];
 
   return (
@@ -70,14 +94,35 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-4 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 font-medium"
-              >
-                {link.label}
-              </Link>
+            {navLinks.map((link, idx) => (
+              link.dropdown ? (
+                <div key={idx} className="relative group">
+                  <button className="flex items-center px-4 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 font-medium">
+                    {link.label} <ChevronDown className="w-4 h-4 ml-1" />
+                  </button>
+                  <div className="absolute left-0 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="py-2">
+                      {link.dropdown.map(sublink => (
+                        <Link
+                          key={sublink.href}
+                          href={sublink.href}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                        >
+                          {sublink.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href!}
+                  className="px-4 py-2 rounded-md text-white hover:bg-white/10 transition-colors duration-200 font-medium"
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </nav>
 
@@ -94,15 +139,31 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="lg:hidden py-4 border-t border-white/20">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMenuOpen(false)}
-                className="block px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200 font-medium"
-              >
-                {link.label}
-              </Link>
+            {navLinks.map((link, idx) => (
+              link.dropdown ? (
+                <div key={idx} className="py-2">
+                  <div className="px-4 py-2 text-white/70 font-bold text-xs uppercase tracking-wider">{link.label}</div>
+                  {link.dropdown.map(sublink => (
+                    <Link
+                      key={sublink.href}
+                      href={sublink.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200 font-medium"
+                    >
+                      {sublink.label}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href!}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200 font-medium"
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </nav>
         )}

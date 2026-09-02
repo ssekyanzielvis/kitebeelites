@@ -58,6 +58,7 @@ interface DonationInsert {
 }
 
 export default function DonatePage() {
+  const theme = useAppStore((state) => state.theme);
   const [submitting, setSubmitting] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [transactionReference, setTransactionReference] = useState<string | null>(null);
@@ -356,7 +357,7 @@ export default function DonatePage() {
     <div className="w-full py-16 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">Make a Donation</h1>
-        <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+        <p className="text-xl text-center mb-12 max-w-3xl mx-auto opacity-70">
           Your generosity helps us continue our mission to create positive change in the community.
         </p>
 
@@ -807,7 +808,8 @@ export default function DonatePage() {
             <button
               type="submit"
               disabled={submitting || processingPayment}
-              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full text-white px-6 py-3 rounded-lg transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              style={{ backgroundColor: theme.primaryColor }}
             >
               {submitting || processingPayment ? (
                 <>

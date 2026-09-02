@@ -1,4 +1,5 @@
 "use client";
+import { adminDb } from '@/lib/supabase/adminDb';
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -36,11 +37,11 @@ interface PartnerApp {
 
 // Helper function to bypass TypeScript strict checking
 const supabaseInsert = async (table: string, data: any) => {
-  return await (supabase as any).from(table).insert(data);
+  return await adminDb(table).insert(data);
 };
 
 const supabaseUpdate = async (table: string, data: any, eq: { column: string; value: string }) => {
-  return await (supabase as any).from(table).update(data).eq(eq.column, eq.value);
+  return await adminDb(table).update(data).eq(eq.column, eq.value);
 };
 
 export default function AdminApplicationsPage() {

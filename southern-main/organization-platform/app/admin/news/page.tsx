@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
 import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import MediaRenderer from '@/components/MediaRenderer';
+import MediaPreviewModal from '@/components/MediaPreviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import FileUpload from '@/components/FileUpload';
 import { useNotification } from '@/lib/store';
@@ -14,6 +17,7 @@ export default function NewsManagement() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
   const { showNotification } = useNotification();
 
@@ -52,18 +56,15 @@ export default function NewsManagement() {
 
     try {
       if (editingNews) {
-        const { error } = await (supabase
-          .from('news') as any)
-          .update({
+        const { error } = await adminDb('news').update({
             ...formData,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingNews.id);
+          }).eq('id', editingNews.id);
 
         if (error) throw error;
         showNotification('News updated successfully', 'success');
       } else {
-        const { error } = await (supabase.from('news') as any).insert(formData);
+        const { error } = await adminDb('news').insert(formData);
 
         if (error) throw error;
         showNotification('News created successfully', 'success');
@@ -82,7 +83,7 @@ export default function NewsManagement() {
     if (!confirm('Are you sure you want to delete this news item?')) return;
 
     try {
-      const { error } = await (supabase.from('news') as any).delete().eq('id', id);
+      const { error } = await adminDb('news').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('News deleted successfully', 'success');
@@ -139,7 +140,7 @@ export default function NewsManagement() {
         {newsItems.map((news) => (
           <div key={news.id} className="bg-white border rounded-lg overflow-hidden">
             {news.image_url && (
-              <img src={news.image_url} alt={news.title} className="w-full h-48 object-cover" />
+              <MediaRenderer src={news.image_url} alt={news.title} className="w-full h-48 object-cover" isThumbnail />
             )}
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
@@ -176,6 +177,13 @@ export default function NewsManagement() {
           </div>
         ))}
       </div>
+
+      {previewMedia && (
+        <MediaPreviewModal 
+          url={previewMedia} 
+          onClose={() => setPreviewMedia(null)} 
+        />
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

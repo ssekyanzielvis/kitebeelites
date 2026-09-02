@@ -2,16 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
-import { Save, RefreshCw } from 'lucide-react';
+import { Save, RefreshCw, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useNotification, useTheme } from '@/lib/store';
+import { formatDistanceToNow } from 'date-fns';
 
 type ThemeSettings = Database['public']['Tables']['theme_settings']['Row'];
 
 export default function ThemeCustomization() {
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutMessage, setLockoutMessage] = useState('');
+  
   const { showNotification } = useNotification();
   const { setTheme: updateTheme } = useTheme();
 
@@ -23,29 +29,47 @@ export default function ThemeCustomization() {
   });
 
   useEffect(() => {
-    fetchTheme();
+    fetchData();
   }, []);
 
-  const fetchTheme = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await (supabase.from('theme_settings') as any).select('*').limit(1).single();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) setCurrentUserEmail(user.email);
+
+      const { data, error } = await (supabase as any).from('theme_settings').select('*').limit(1).single();
 
       if (data) {
-        setTheme(data);
+        const themeData = data as any;
+        setTheme(themeData);
         setFormData({
-          backgroundColor: (data as any).backgroundcolor ?? '#FFFFFF',
-          textColor: (data as any).textcolor ?? '#000000',
-          primaryColor: (data as any).primarycolor ?? '#1B5E20',
-          fontFamily: (data as any).fontfamily ?? 'system-ui',
+          backgroundColor: themeData.background_color ?? '#FFFFFF',
+          textColor: themeData.text_color ?? '#000000',
+          primaryColor: themeData.primary_color ?? '#1B5E20',
+          fontFamily: themeData.font_family ?? 'system-ui',
         });
 
         // Apply theme to store
         updateTheme({
-          backgroundColor: (data as any).backgroundcolor ?? '#FFFFFF',
-          textColor: (data as any).textcolor ?? '#000000',
-          primaryColor: (data as any).primarycolor ?? '#1B5E20',
-          fontFamily: (data as any).fontfamily ?? 'system-ui',
+          backgroundColor: themeData.background_color ?? '#FFFFFF',
+          textColor: themeData.text_color ?? '#000000',
+          primaryColor: themeData.primary_color ?? '#1B5E20',
+          fontFamily: themeData.font_family ?? 'system-ui',
         });
+
+        // Lockout logic
+        const lastUpdated = new Date(themeData.updated_at);
+        const now = new Date();
+        const hoursDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
+
+        if (hoursDiff < 24 && themeData.updated_by && themeData.updated_by !== user?.email) {
+          setIsLocked(true);
+          const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+          setLockoutMessage(`Theme was modified by ${themeData.updated_by} ${timeAgo}. You must wait 24 hours from their change to modify the theme.`);
+        } else {
+          setIsLocked(false);
+          setLockoutMessage('');
+        }
       }
     } catch (error: any) {
       console.error('Failed to load theme', error);
@@ -58,24 +82,23 @@ export default function ThemeCustomization() {
     setLoading(true);
     try {
       if (theme) {
-        const { error } = await (supabase
-          .from('theme_settings') as any)
-          .update({
-            backgroundcolor: formData.backgroundColor,
-            textcolor: formData.textColor,
-            primarycolor: formData.primaryColor,
-            fontfamily: formData.fontFamily,
+        const { error } = await adminDb('theme_settings').update({
+            background_color: formData.backgroundColor,
+            text_color: formData.textColor,
+            primary_color: formData.primaryColor,
+            font_family: formData.fontFamily,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', (theme as any).id);
+            updated_by: currentUserEmail,
+          }).eq('id', theme.id);
 
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from('theme_settings') as any).insert({
-          backgroundcolor: formData.backgroundColor,
-          textcolor: formData.textColor,
-          primarycolor: formData.primaryColor,
-          fontfamily: formData.fontFamily,
+        const { error } = await adminDb('theme_settings').insert({
+          background_color: formData.backgroundColor,
+          text_color: formData.textColor,
+          primary_color: formData.primaryColor,
+          font_family: formData.fontFamily,
+          updated_by: currentUserEmail,
         });
 
         if (error) throw error;
@@ -83,7 +106,7 @@ export default function ThemeCustomization() {
 
       updateTheme(formData);
       showNotification('Theme updated successfully', 'success');
-      fetchTheme();
+      fetchData();
     } catch (error: any) {
       showNotification(error.message, 'error');
     } finally {
@@ -119,6 +142,13 @@ export default function ThemeCustomization() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Theme Customization</h1>
 
+      {isLocked && (
+        <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg flex gap-3">
+          <AlertCircle className="w-5 h-5 text-yellow-600 shrink-0" />
+          <p className="text-sm text-yellow-800">{lockoutMessage}</p>
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Color Settings</h2>
@@ -130,13 +160,15 @@ export default function ThemeCustomization() {
                   type="color"
                   value={formData.primaryColor}
                   onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                  className="w-16 h-10 border rounded cursor-pointer"
+                  disabled={isLocked}
+                  className="w-16 h-10 border rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <input
                   type="text"
                   value={formData.primaryColor}
                   onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                  className="flex-1 border rounded-lg px-3 py-2 font-mono text-sm"
+                  disabled={isLocked}
+                  className="flex-1 border rounded-lg px-3 py-2 font-mono text-sm disabled:bg-gray-100"
                 />
               </div>
             </div>
@@ -148,13 +180,15 @@ export default function ThemeCustomization() {
                   type="color"
                   value={formData.backgroundColor}
                   onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                  className="w-16 h-10 border rounded cursor-pointer"
+                  disabled={isLocked}
+                  className="w-16 h-10 border rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <input
                   type="text"
                   value={formData.backgroundColor}
                   onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                  className="flex-1 border rounded-lg px-3 py-2 font-mono text-sm"
+                  disabled={isLocked}
+                  className="flex-1 border rounded-lg px-3 py-2 font-mono text-sm disabled:bg-gray-100"
                 />
               </div>
             </div>
@@ -166,13 +200,15 @@ export default function ThemeCustomization() {
                   type="color"
                   value={formData.textColor}
                   onChange={(e) => setFormData({ ...formData, textColor: e.target.value })}
-                  className="w-16 h-10 border rounded cursor-pointer"
+                  disabled={isLocked}
+                  className="w-16 h-10 border rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <input
                   type="text"
                   value={formData.textColor}
                   onChange={(e) => setFormData({ ...formData, textColor: e.target.value })}
-                  className="flex-1 border rounded-lg px-3 py-2 font-mono text-sm"
+                  disabled={isLocked}
+                  className="flex-1 border rounded-lg px-3 py-2 font-mono text-sm disabled:bg-gray-100"
                 />
               </div>
             </div>
@@ -182,7 +218,8 @@ export default function ThemeCustomization() {
               <select
                 value={formData.fontFamily}
                 onChange={(e) => setFormData({ ...formData, fontFamily: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                disabled={isLocked}
+                className="w-full border rounded-lg px-3 py-2 disabled:bg-gray-100"
               >
                 {fontOptions.map((font) => (
                   <option key={font} value={font} style={{ fontFamily: font }}>
@@ -195,15 +232,16 @@ export default function ThemeCustomization() {
             <div className="flex gap-2 pt-4">
               <button
                 onClick={handleSave}
-                disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                disabled={loading || isLocked}
+                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
                 Save Theme
               </button>
               <button
                 onClick={handleReset}
-                className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 flex items-center justify-center gap-2"
+                disabled={isLocked}
+                className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RefreshCw className="w-4 h-4" />
                 Reset to Default
@@ -244,7 +282,7 @@ export default function ThemeCustomization() {
             </button>
           </div>
 
-          <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+          <div className="mt-6 p-4 rounded-lg opacity-80" style={{ backgroundColor: 'rgba(128,128,128,0.1)' }}>
             <p className="text-sm">
               <strong>Note:</strong> Changes will be applied across the entire website after saving.
               Make sure to test readability and contrast before finalizing.
@@ -255,4 +293,3 @@ export default function ThemeCustomization() {
     </div>
   );
 }
-

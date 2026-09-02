@@ -27,6 +27,10 @@ import {
   Trophy,
   HandHeart,
   ShieldCheck,
+  CreditCard,
+  HelpCircle,
+  Users2,
+  ScrollText,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -70,24 +74,53 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Dashboard',       href: '/admin/dashboard',       icon: LayoutDashboard },
     { name: 'Hero Slides',     href: '/admin/slides',          icon: Image },
     { name: 'Content',         href: '/admin/content',         icon: FileText },
-    { name: 'Pillars',         href: '/admin/programs',        icon: Briefcase },
+    { name: 'Programs',        href: '/admin/programs',        icon: Briefcase },
     { name: 'Achievements',    href: '/admin/achievements',    icon: Award },
     { name: 'Core Values',     href: '/admin/core-values',     icon: Heart },
     { name: 'Gallery',         href: '/admin/gallery',         icon: ImageIcon },
     { name: 'News',            href: '/admin/news',            icon: Newspaper },
     { name: 'Leadership',      href: '/admin/leadership',      icon: ShieldCheck },
     // ── Kitebe-specific ────────────────────
-    { name: 'League',          href: '/admin/programs',        icon: Trophy },
-    { name: 'Members',         href: '/admin/staff',           icon: Users },
-    { name: 'Charity Visits',  href: '/admin/donations',       icon: HandHeart },
+    { name: 'Leagues',              href: '/admin/leagues',            icon: Trophy },
+    { name: 'Members',              href: '/admin/staff',              icon: Users },
+    { name: 'Charity Visits',       href: '/admin/charity-visits',     icon: HandHeart },
+    // ── Community ──────────────────────────
+    { name: 'Community Members',    href: '/admin/community-members',  icon: Users2 },
+    { name: 'Policies',             href: '/admin/policies',           icon: ScrollText },
     // ── Engagement ─────────────────────────
-    { name: 'Contacts',        href: '/admin/contacts',        icon: Mail },
-    { name: 'Donations',       href: '/admin/donations',       icon: DollarSign },
-    { name: 'Analytics',       href: '/admin/analytics',       icon: BarChart3 },
-    { name: 'Theme',           href: '/admin/theme',           icon: Palette },
-    { name: 'Settings',        href: '/admin/settings',        icon: Settings },
-    { name: 'Users',           href: '/admin/users',           icon: UserPlus },
+    { name: 'Why We Donate',        href: '/admin/why-donate',         icon: HelpCircle },
+    { name: 'Contacts',             href: '/admin/contacts',           icon: Mail },
+    { name: 'Donations',            href: '/admin/donations',          icon: DollarSign },
+    { name: 'Payment Numbers',      href: '/admin/payment-numbers',    icon: CreditCard },
+    { name: 'Analytics',            href: '/admin/analytics',          icon: BarChart3 },
+    { name: 'Theme',                href: '/admin/theme',              icon: Palette },
+    { name: 'Settings',             href: '/admin/settings',           icon: Settings },
+    { name: 'Users',                href: '/admin/users',              icon: UserPlus },
   ];
+
+  const getPreviewUrl = (path: string) => {
+    const component = path.split('/').pop();
+    switch (component) {
+      case 'content': return '/about';
+      case 'programs': return '/programs';
+      case 'achievements': return '/achievements';
+      case 'core-values': return '/core-values';
+      case 'gallery': return '/gallery';
+      case 'news': return '/news';
+      case 'leadership': return '/leadership';
+      case 'leagues': return '/leagues';
+      case 'contacts': return '/contact';
+      case 'donations': return '/donate';
+      case 'staff': return '/staff';
+      case 'partners': return '/partners';
+      case 'volunteers': return '/volunteers';
+      case 'office-hours': return '/contact';
+      case 'payment-numbers': return '/donate';
+      case 'community-members': return '/members';
+      case 'policies': return '/policies';
+      default: return '/';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -108,7 +141,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {admin && (
               <>
                 <a
-                  href="/"
+                  href={getPreviewUrl(pathname)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

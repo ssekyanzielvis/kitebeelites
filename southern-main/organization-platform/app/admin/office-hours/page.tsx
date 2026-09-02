@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { useAppStore } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -54,18 +55,15 @@ export default function OfficeHoursPage() {
 
     try {
       if (editingHour) {
-        const { error } = await (supabase
-          .from('office_hours') as any)
-          .update({
+        const { error } = await adminDb('office_hours').update({
             ...formData,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingHour.id);
+          }).eq('id', editingHour.id);
 
         if (error) throw error;
         showNotification('Office hours updated successfully', 'success');
       } else {
-        const { error } = await (supabase.from('office_hours') as any).insert(formData);
+        const { error } = await adminDb('office_hours').insert(formData);
 
         if (error) throw error;
         showNotification('Office hours created successfully', 'success');
@@ -84,7 +82,7 @@ export default function OfficeHoursPage() {
     if (!confirm('Are you sure you want to delete this office hour?')) return;
 
     try {
-      const { error } = await (supabase.from('office_hours') as any).delete().eq('id', id);
+      const { error } = await adminDb('office_hours').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Office hours deleted successfully', 'success');
@@ -96,10 +94,7 @@ export default function OfficeHoursPage() {
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await (supabase
-        .from('office_hours') as any)
-        .update({ is_active: !currentStatus })
-        .eq('id', id);
+      const { error } = await adminDb('office_hours').update({ is_active: !currentStatus }).eq('id', id);
 
       if (error) throw error;
       showNotification(`Office hours ${!currentStatus ? 'activated' : 'deactivated'}`, 'success');

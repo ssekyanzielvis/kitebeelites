@@ -2,6 +2,94 @@
 export interface Database {
   public: {
     Tables: {
+      charity_visits: {
+        Row: {
+          id: string;
+          title: string;
+          location: string;
+          visit_date: string;
+          status: string;
+          objective: string | null;
+          activities: string | null;
+          estimated_budget_ugx: number | null;
+          actual_spent_ugx: number | null;
+          impact_summary: string | null;
+          main_media_url: string | null;
+          main_media_type: string | null;
+          funders: any;
+          gallery: any;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          location: string;
+          visit_date: string;
+          status?: string;
+          objective?: string | null;
+          activities?: string | null;
+          estimated_budget_ugx?: number | null;
+          actual_spent_ugx?: number | null;
+          impact_summary?: string | null;
+          main_media_url?: string | null;
+          main_media_type?: string | null;
+          funders?: any;
+          gallery?: any;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          location?: string;
+          visit_date?: string;
+          status?: string;
+          objective?: string | null;
+          activities?: string | null;
+          estimated_budget_ugx?: number | null;
+          actual_spent_ugx?: number | null;
+          impact_summary?: string | null;
+          main_media_url?: string | null;
+          main_media_type?: string | null;
+          funders?: any;
+          gallery?: any;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      why_donate: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          media_url: string | null;
+          media_type: string | null;
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description?: string | null;
+          media_url?: string | null;
+          media_type?: string | null;
+          display_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string | null;
+          media_url?: string | null;
+          media_type?: string | null;
+          display_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       admins: {
         Row: {
           id: string;
@@ -479,7 +567,7 @@ export interface Database {
       gallery: {
         Row: {
           id: string;
-          media_url: string;
+          image_url: string;
           media_type: 'image' | 'video';
           description: string | null;
           category: string | null;
@@ -491,7 +579,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          media_url: string;
+          image_url: string;
           media_type?: 'image' | 'video';
           description?: string | null;
           category?: string | null;
@@ -503,7 +591,7 @@ export interface Database {
         };
         Update: {
           id?: string;
-          media_url?: string;
+          image_url?: string;
           media_type?: 'image' | 'video';
           description?: string | null;
           category?: string | null;
@@ -922,6 +1010,251 @@ export interface Database {
           is_active?: boolean;
         };
       };
+      leagues: {
+        Row: {
+          id: string;
+          name: string;
+          short_name: string | null;
+          slug: string | null;
+          description: string | null;
+          sport: string | null;
+          competition_type: string | null;
+          season: string | null;
+          gender: string | null;
+          age_category: string | null;
+          location: string | null;
+          venue: string | null;
+          organizer: string | null;
+          logo_url: string | null;
+          cover_url: string | null;
+          status: string | null;
+          start_date: string | null;
+          end_date: string | null;
+          reg_start_date: string | null;
+          reg_end_date: string | null;
+          is_active: boolean;
+          is_featured: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          short_name?: string | null;
+          slug?: string | null;
+          description?: string | null;
+          sport?: string | null;
+          competition_type?: string | null;
+          season?: string | null;
+          gender?: string | null;
+          age_category?: string | null;
+          location?: string | null;
+          venue?: string | null;
+          organizer?: string | null;
+          logo_url?: string | null;
+          cover_url?: string | null;
+          status?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          reg_start_date?: string | null;
+          reg_end_date?: string | null;
+          is_active?: boolean;
+          is_featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          short_name?: string | null;
+          slug?: string | null;
+          description?: string | null;
+          sport?: string | null;
+          competition_type?: string | null;
+          season?: string | null;
+          gender?: string | null;
+          age_category?: string | null;
+          location?: string | null;
+          venue?: string | null;
+          organizer?: string | null;
+          logo_url?: string | null;
+          cover_url?: string | null;
+          status?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          reg_start_date?: string | null;
+          reg_end_date?: string | null;
+          is_active?: boolean;
+          is_featured?: boolean;
+          updated_at?: string;
+        };
+      };
+      league_media: {
+        Row: {
+          id: string;
+          league_id: string | null;
+          title: string;
+          description: string | null;
+          media_url: string;
+          media_type: string;
+          category: string | null;
+          is_featured: boolean;
+          is_published: boolean;
+          display_order: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id?: string | null;
+          title: string;
+          description?: string | null;
+          media_url: string;
+          media_type: string;
+          category?: string | null;
+          is_featured?: boolean;
+          is_published?: boolean;
+          display_order?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string | null;
+          title?: string;
+          description?: string | null;
+          media_url?: string;
+          media_type?: string;
+          category?: string | null;
+          is_featured?: boolean;
+          is_published?: boolean;
+          display_order?: number | null;
+        };
+      };
+      teams: {
+        Row: {
+          id: string;
+          league_id: string | null;
+          name: string;
+          logo_url: string | null;
+          description: string | null;
+          location: string | null;
+          manager: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id?: string | null;
+          name: string;
+          logo_url?: string | null;
+          description?: string | null;
+          location?: string | null;
+          manager?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string | null;
+          name?: string;
+          logo_url?: string | null;
+          description?: string | null;
+          location?: string | null;
+          manager?: string | null;
+          updated_at?: string;
+        };
+      };
+      fixtures: {
+        Row: {
+          id: string;
+          league_id: string | null;
+          home_team_id: string | null;
+          away_team_id: string | null;
+          match_date: string | null;
+          venue: string | null;
+          status: string | null;
+          match_type: string | null;
+          home_score: number | null;
+          away_score: number | null;
+          match_report: string | null;
+          highlights_url: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id?: string | null;
+          home_team_id?: string | null;
+          away_team_id?: string | null;
+          match_date?: string | null;
+          venue?: string | null;
+          status?: string | null;
+          match_type?: string | null;
+          home_score?: number | null;
+          away_score?: number | null;
+          match_report?: string | null;
+          highlights_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string | null;
+          home_team_id?: string | null;
+          away_team_id?: string | null;
+          match_date?: string | null;
+          venue?: string | null;
+          status?: string | null;
+          match_type?: string | null;
+          home_score?: number | null;
+          away_score?: number | null;
+          match_report?: string | null;
+          highlights_url?: string | null;
+          updated_at?: string;
+        };
+      };
+      standings: {
+        Row: {
+          id: string;
+          league_id: string | null;
+          team_id: string | null;
+          played: number;
+          won: number;
+          drawn: number;
+          lost: number;
+          goals_for: number;
+          goals_against: number;
+          points: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id?: string | null;
+          team_id?: string | null;
+          played?: number;
+          won?: number;
+          drawn?: number;
+          lost?: number;
+          goals_for?: number;
+          goals_against?: number;
+          points?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string | null;
+          team_id?: string | null;
+          played?: number;
+          won?: number;
+          drawn?: number;
+          lost?: number;
+          goals_for?: number;
+          goals_against?: number;
+          points?: number;
+          updated_at?: string;
+        };
+      };
       members: {
         Row: {
           id: string;
@@ -983,18 +1316,13 @@ export interface Database {
           updated_at?: string;
         };
       };
-      charity_visits: {
+      community_policies: {
+
         Row: {
           id: string;
           title: string;
-          location: string;
-          visit_date: string;
-          description: string | null;
-          items_donated: string | null;
-          beneficiaries: number | null;
-          image_url: string | null;
-          category: string;
-          is_featured: boolean;
+          content: string;
+          display_order: number;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -1002,14 +1330,8 @@ export interface Database {
         Insert: {
           id?: string;
           title: string;
-          location: string;
-          visit_date: string;
-          description?: string | null;
-          items_donated?: string | null;
-          beneficiaries?: number | null;
-          image_url?: string | null;
-          category?: string;
-          is_featured?: boolean;
+          content: string;
+          display_order?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -1017,15 +1339,140 @@ export interface Database {
         Update: {
           id?: string;
           title?: string;
-          location?: string;
-          visit_date?: string;
-          description?: string | null;
-          items_donated?: string | null;
-          beneficiaries?: number | null;
-          image_url?: string | null;
-          category?: string;
-          is_featured?: boolean;
+          content?: string;
+          display_order?: number;
           is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      member_applications: {
+        Row: {
+          id: string;
+          full_name: string;
+          email: string;
+          phone_number: string;
+          nationality: string;
+          gender: string;
+          date_of_birth: string;
+          why_join: string;
+          self_description: string;
+          academic_background: string;
+          education_level: string;
+          additional_info: string | null;
+          policies_accepted: boolean;
+          status: string;
+          rejection_reason: string | null;
+          approval_token: string | null;
+          profile_completed: boolean;
+          admin_notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          email: string;
+          phone_number: string;
+          nationality: string;
+          gender: string;
+          date_of_birth: string;
+          why_join: string;
+          self_description: string;
+          academic_background: string;
+          education_level: string;
+          additional_info?: string | null;
+          policies_accepted?: boolean;
+          status?: string;
+          rejection_reason?: string | null;
+          approval_token?: string | null;
+          profile_completed?: boolean;
+          admin_notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          email?: string;
+          phone_number?: string;
+          nationality?: string;
+          gender?: string;
+          date_of_birth?: string;
+          why_join?: string;
+          self_description?: string;
+          academic_background?: string;
+          education_level?: string;
+          additional_info?: string | null;
+          policies_accepted?: boolean;
+          status?: string;
+          rejection_reason?: string | null;
+          approval_token?: string | null;
+          profile_completed?: boolean;
+          admin_notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      community_members: {
+        Row: {
+          id: string;
+          application_id: string | null;
+          full_name: string;
+          email: string;
+          phone_number: string | null;
+          nationality: string | null;
+          gender: string | null;
+          date_of_birth: string | null;
+          why_join: string | null;
+          self_description: string | null;
+          academic_background: string | null;
+          education_level: string | null;
+          additional_info: string | null;
+          profile_image_url: string | null;
+          extra_profile_info: string | null;
+          is_active: boolean;
+          joined_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          application_id?: string | null;
+          full_name: string;
+          email: string;
+          phone_number?: string | null;
+          nationality?: string | null;
+          gender?: string | null;
+          date_of_birth?: string | null;
+          why_join?: string | null;
+          self_description?: string | null;
+          academic_background?: string | null;
+          education_level?: string | null;
+          additional_info?: string | null;
+          profile_image_url?: string | null;
+          extra_profile_info?: string | null;
+          is_active?: boolean;
+          joined_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          application_id?: string | null;
+          full_name?: string;
+          email?: string;
+          phone_number?: string | null;
+          nationality?: string | null;
+          gender?: string | null;
+          date_of_birth?: string | null;
+          why_join?: string | null;
+          self_description?: string | null;
+          academic_background?: string | null;
+          education_level?: string | null;
+          additional_info?: string | null;
+          profile_image_url?: string | null;
+          extra_profile_info?: string | null;
+          is_active?: boolean;
+          joined_at?: string;
           updated_at?: string;
         };
       };

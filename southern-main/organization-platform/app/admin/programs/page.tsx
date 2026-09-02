@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import MediaRenderer from '@/components/MediaRenderer';
+import MediaPreviewModal from '@/components/MediaPreviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import FileUpload from '@/components/FileUpload';
 import { useNotification } from '@/lib/store';
@@ -14,6 +17,7 @@ export default function ProgramsManagement() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<string | null>(null);
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
   const { showNotification } = useNotification();
 
@@ -51,18 +55,15 @@ export default function ProgramsManagement() {
 
     try {
       if (editingProgram) {
-        const { error } = await (supabase
-          .from('programs') as any)
-          .update({
+        const { error } = await adminDb('programs').update({
             ...formData,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingProgram.id);
+          }).eq('id', editingProgram.id);
 
         if (error) throw error;
         showNotification('Program updated successfully', 'success');
       } else {
-        const { error } = await (supabase.from('programs') as any).insert(formData);
+        const { error } = await adminDb('programs').insert(formData);
 
         if (error) throw error;
         showNotification('Program created successfully', 'success');
@@ -81,7 +82,7 @@ export default function ProgramsManagement() {
     if (!confirm('Are you sure you want to delete this program?')) return;
 
     try {
-      const { error } = await (supabase.from('programs') as any).delete().eq('id', id);
+      const { error } = await adminDb('programs').delete().eq('id', id);
 
       if (error) throw error;
       showNotification('Program deleted successfully', 'success');
@@ -136,11 +137,7 @@ export default function ProgramsManagement() {
         {programs.map((program) => (
           <div key={program.id} className="bg-white border rounded-lg overflow-hidden">
             {program.image_url && (
-              <img
-                src={program.image_url}
-                alt={program.title}
-                className="w-full h-48 object-cover"
-              />
+              <MediaRenderer src={program.image_url} alt={program.title} className="w-full h-48 object-cover" isThumbnail />
             )}
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
@@ -177,6 +174,13 @@ export default function ProgramsManagement() {
           </div>
         ))}
       </div>
+
+      {previewMedia && (
+        <MediaPreviewModal 
+          url={previewMedia} 
+          onClose={() => setPreviewMedia(null)} 
+        />
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

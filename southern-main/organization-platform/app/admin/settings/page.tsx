@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { adminDb } from '@/lib/supabase/adminDb';
 import { Database } from '@/lib/supabase/types';
 import { Save } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -78,17 +79,14 @@ export default function Settings() {
     setLoading(true);
     try {
       if (footerInfo) {
-        const { error } = await (supabase
-          .from('footer_info') as any)
-          .update({
+        const { error } = await adminDb('footer_info').update({
             ...footerForm,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', footerInfo.id);
+          }).eq('id', footerInfo.id);
 
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from('footer_info') as any).insert(footerForm);
+        const { error } = await adminDb('footer_info').insert(footerForm);
 
         if (error) throw error;
       }
@@ -106,17 +104,14 @@ export default function Settings() {
     setLoading(true);
     try {
       if (paymentSettings) {
-        const { error } = await (supabase
-          .from('payment_settings') as any)
-          .update({
+        const { error } = await adminDb('payment_settings').update({
             ...paymentForm,
             updated_at: new Date().toISOString(),
-          })
-          .eq('id', paymentSettings.id);
+          }).eq('id', paymentSettings.id);
 
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from('payment_settings') as any).insert(paymentForm);
+        const { error } = await adminDb('payment_settings').insert(paymentForm);
 
         if (error) throw error;
       }

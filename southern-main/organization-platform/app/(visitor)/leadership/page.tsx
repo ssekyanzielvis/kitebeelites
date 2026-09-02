@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import MediaRenderer from '@/components/MediaRenderer';
 import Image from 'next/image';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { supabase } from '@/lib/supabase/client';
@@ -62,12 +63,15 @@ export default function LeadershipPage() {
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
             >
               <div className="relative w-full h-80">
-                <Image
-                  src={leader.image_url}
-                  alt={leader.full_name}
-                  fill
-                  className="object-cover"
-                />
+                {leader.image_url ? (
+                  <MediaRenderer                     src={leader.image_url}
+                    alt={leader.full_name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-green-800 to-green-700" />
+                )}
               </div>
               <div className="p-6">
                 <h3 className="text-2xl font-bold mb-2">{leader.full_name}</h3>

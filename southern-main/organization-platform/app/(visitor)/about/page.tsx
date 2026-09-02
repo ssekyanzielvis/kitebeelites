@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import MediaRenderer from '@/components/MediaRenderer';
 import Image from 'next/image';
 import TruncatedText from '@/components/TruncatedText';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -98,19 +99,17 @@ export default function AboutPage() {
             >
               {item.image_url && (
                 <div className="w-full md:w-1/2">
-                  <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg">
-                    <Image
-                      src={item.image_url}
+                  <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg border border-current border-opacity-10">
+                    <MediaRenderer                       src={item.image_url}
                       alt="About us"
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
                     />
                   </div>
                 </div>
               )}
               <div className={`w-full ${item.image_url ? 'md:w-1/2' : 'md:w-full'}`}>
-                <div className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
+                <div className="text-lg leading-relaxed whitespace-pre-line opacity-80">
                   <TruncatedText text={item.description} />
                 </div>
               </div>
@@ -125,19 +124,17 @@ export default function AboutPage() {
             <div className="flex flex-col md:flex-row items-center gap-8">
               {vision.image_url && (
                 <div className="w-full md:w-1/2">
-                  <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-                    <Image
-                      src={vision.image_url}
+                  <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg border border-current border-opacity-10">
+                    <MediaRenderer                       src={vision.image_url}
                       alt="Our Vision"
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
                     />
                   </div>
                 </div>
               )}
-              <div className={`w-full ${vision.image_url ? 'md:w-1/2' : 'md:w-full'} bg-blue-50 p-8 rounded-lg`}>
-                <div className="text-xl text-gray-800 leading-relaxed whitespace-pre-line">
+              <div className={`w-full ${vision.image_url ? 'md:w-1/2' : 'md:w-full'} bg-black/5 p-8 rounded-lg`}>
+                <div className="text-xl leading-relaxed whitespace-pre-line opacity-90">
                   <TruncatedText text={vision.statement} />
                 </div>
               </div>
@@ -152,19 +149,17 @@ export default function AboutPage() {
             <div className="flex flex-col md:flex-row items-center gap-8">
               {mission.image_url && (
                 <div className="w-full md:w-1/2">
-                  <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-                    <Image
-                      src={mission.image_url}
+                  <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg border border-current border-opacity-10">
+                    <MediaRenderer                       src={mission.image_url}
                       alt="Our Mission"
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
                     />
                   </div>
                 </div>
               )}
-              <div className={`w-full ${mission.image_url ? 'md:w-1/2' : 'md:w-full'} bg-green-50 p-8 rounded-lg`}>
-                <div className="text-xl text-gray-800 leading-relaxed whitespace-pre-line">
+              <div className={`w-full ${mission.image_url ? 'md:w-1/2' : 'md:w-full'} bg-black/5 p-8 rounded-lg`}>
+                <div className="text-xl leading-relaxed whitespace-pre-line opacity-90">
                   <TruncatedText text={mission.statement} />
                 </div>
               </div>
@@ -180,23 +175,21 @@ export default function AboutPage() {
               {objectives.map((objective) => (
                 <div
                   key={objective.id}
-                  className="flex flex-col md:flex-row items-center gap-8 bg-white rounded-lg shadow-md p-6"
+                  className="flex flex-col md:flex-row items-center gap-8 bg-black/5 rounded-lg shadow-md p-6"
                 >
                   {objective.image_url && (
                     <div className="w-full md:w-1/3">
-                      <div className="relative w-full h-48 rounded-lg overflow-hidden">
-                        <Image
-                          src={objective.image_url}
+                      <div className="relative w-full h-48 rounded-lg overflow-hidden border border-current border-opacity-10">
+                        <MediaRenderer                           src={objective.image_url}
                           alt="Objective"
                           fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
                           className="object-cover"
                         />
                       </div>
                     </div>
                   )}
                   <div className={`w-full ${objective.image_url ? 'md:w-2/3' : 'md:w-full'}`}>
-                    <div className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
+                    <div className="text-lg leading-relaxed whitespace-pre-line opacity-80">
                       <TruncatedText text={objective.statement} />
                     </div>
                   </div>
@@ -208,7 +201,7 @@ export default function AboutPage() {
 
         {content.length === 0 && !vision && !mission && objectives.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-500">No content available at the moment.</p>
+            <p className="text-xl opacity-50">No content available at the moment.</p>
           </div>
         )}
       </div>
