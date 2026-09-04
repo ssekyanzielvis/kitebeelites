@@ -31,6 +31,7 @@ import {
   HelpCircle,
   Users2,
   ScrollText,
+  GraduationCap,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -80,8 +81,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Gallery',         href: '/admin/gallery',         icon: ImageIcon },
     { name: 'News',            href: '/admin/news',            icon: Newspaper },
     { name: 'Leadership',      href: '/admin/leadership',      icon: ShieldCheck },
+    { name: 'Graduates',       href: '/admin/graduates',       icon: GraduationCap },
     // ── Kitebe-specific ────────────────────
     { name: 'Leagues',              href: '/admin/leagues',            icon: Trophy },
+    { name: 'Players',              href: '/admin/players',            icon: Users2 },
+    { name: 'Sponsorships',         href: '/admin/sponsorships',       icon: DollarSign },
     { name: 'Members',              href: '/admin/staff',              icon: Users },
     { name: 'Charity Visits',       href: '/admin/charity-visits',     icon: HandHeart },
     // ── Community ──────────────────────────

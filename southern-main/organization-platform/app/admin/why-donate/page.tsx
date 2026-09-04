@@ -58,11 +58,13 @@ export default function WhyDonateManagement() {
       };
 
       if (editingItem) {
-        await adminDb('why_donate').update(payload).eq('id', editingItem.id);
+        const { error } = await adminDb('why_donate').update(payload).eq('id', editingItem.id);
+        if (error) throw error;
         showNotification('Item updated', 'success');
       } else {
         const display_order = items.length;
-        await adminDb('why_donate').insert([{ ...payload, display_order }]);
+        const { error } = await adminDb('why_donate').insert([{ ...payload, display_order }]);
+        if (error) throw error;
         showNotification('Item added', 'success');
       }
       

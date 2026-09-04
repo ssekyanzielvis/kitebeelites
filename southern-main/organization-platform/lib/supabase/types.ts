@@ -90,6 +90,112 @@ export interface Database {
           updated_at?: string;
         };
       };
+      players: {
+        Row: {
+          id: string;
+          league_id: string | null;
+          name: string;
+          date_of_birth: string | null;
+          height: string | null;
+          weight: string | null;
+          speed: string | null;
+          marital_status: string | null;
+          networth: string | null;
+          shirt_number: string | null;
+          international_team: string | null;
+          best_international_player: string | null;
+          favourite_dish: string | null;
+          smartest_player_chosen: string | null;
+          profile_image_url: string | null;
+          origin: string | null;
+          academics: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          league_id?: string | null;
+          name: string;
+          date_of_birth?: string | null;
+          height?: string | null;
+          weight?: string | null;
+          speed?: string | null;
+          marital_status?: string | null;
+          networth?: string | null;
+          shirt_number?: string | null;
+          international_team?: string | null;
+          best_international_player?: string | null;
+          favourite_dish?: string | null;
+          smartest_player_chosen?: string | null;
+          profile_image_url?: string | null;
+          origin?: string | null;
+          academics?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          league_id?: string | null;
+          name?: string;
+          date_of_birth?: string | null;
+          height?: string | null;
+          weight?: string | null;
+          speed?: string | null;
+          marital_status?: string | null;
+          networth?: string | null;
+          shirt_number?: string | null;
+          international_team?: string | null;
+          best_international_player?: string | null;
+          favourite_dish?: string | null;
+          smartest_player_chosen?: string | null;
+          profile_image_url?: string | null;
+          origin?: string | null;
+          academics?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "players_league_id_fkey";
+            columns: ["league_id"];
+            isOneToOne: false;
+            referencedRelation: "leagues";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      graduates: {
+        Row: {
+          id: string;
+          full_name: string;
+          profile_image_url: string | null;
+          graduation_year: number;
+          course: string;
+          is_active: boolean;
+          is_featured: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          profile_image_url?: string | null;
+          graduation_year: number;
+          course: string;
+          is_active?: boolean;
+          is_featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          profile_image_url?: string | null;
+          graduation_year?: number;
+          course?: string;
+          is_active?: boolean;
+          is_featured?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       admins: {
         Row: {
           id: string;
@@ -190,6 +296,85 @@ export interface Database {
           skills?: string;
           is_approved?: boolean;
           created_at?: string;
+        };
+      };
+      program_sponsorships: {
+        Row: {
+          id: string;
+          program_id: string;
+          full_name: string;
+          email: string | null;
+          phone: string | null;
+          amount_or_item: string;
+          status: string;
+          logo_url: string | null;
+          message: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          program_id: string;
+          full_name: string;
+          email?: string | null;
+          phone?: string | null;
+          amount_or_item: string;
+          status?: string;
+          logo_url?: string | null;
+          message?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          program_id?: string;
+          full_name?: string;
+          email?: string | null;
+          phone?: string | null;
+          amount_or_item?: string;
+          status?: string;
+          logo_url?: string | null;
+          message?: string | null;
+          created_at?: string;
+        };
+      };
+      partners: {
+        Row: {
+          id: string;
+          full_name: string;
+          organization_name: string;
+          email: string;
+          offer: string;
+          nationality: string;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          business_name?: string | null;
+          logo_url?: string | null;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          organization_name: string;
+          email: string;
+          offer: string;
+          nationality: string;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          business_name?: string | null;
+          logo_url?: string | null;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          organization_name?: string;
+          email?: string;
+          offer?: string;
+          nationality?: string;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          business_name?: string | null;
+          logo_url?: string | null;
         };
       };
       partner_applications: {
@@ -467,6 +652,9 @@ export interface Database {
           is_active: boolean;
           created_at: string;
           updated_at: string;
+          start_date?: string;
+          end_date?: string;
+          budget_items?: any;
         };
         Insert: {
           id?: string;
@@ -478,6 +666,9 @@ export interface Database {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          start_date?: string;
+          end_date?: string;
+          budget_items?: any;
         };
         Update: {
           id?: string;
@@ -489,6 +680,9 @@ export interface Database {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          start_date?: string;
+          end_date?: string;
+          budget_items?: any;
         };
       };
       achievements: {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Mail, Phone, MapPin, Building2 } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { useHydratedTheme } from '@/lib/store';
 import { supabase } from '@/lib/supabase/client';
 
 interface FooterData {
@@ -20,7 +20,7 @@ interface FooterData {
 
 export default function Footer() {
   const [footerData, setFooterData] = useState<FooterData | null>(null);
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
 
   useEffect(() => {
     let mounted = true;
@@ -70,13 +70,43 @@ export default function Footer() {
 
             <div className="mt-8">
               <h3 className="text-lg font-bold mb-3">Community</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="/policies" className="text-sm hover:underline opacity-90 hover:opacity-100 flex items-center gap-2">
-                    Community Policies
-                  </a>
-                </li>
-              </ul>
+              <div className="flex flex-wrap gap-2">
+                <a 
+                  href="/staff" 
+                  className="px-3 py-1.5 rounded text-sm font-medium text-white transition-opacity hover:opacity-90" 
+                  style={{ backgroundColor: '#8fbc8f' }}
+                >
+                  Members
+                </a>
+                <a 
+                  href="/volunteers" 
+                  className="px-3 py-1.5 rounded text-sm font-medium text-white transition-opacity hover:opacity-90" 
+                  style={{ backgroundColor: '#8fbc8f' }}
+                >
+                  Volunteers
+                </a>
+                <a 
+                  href="/partners" 
+                  className="px-3 py-1.5 rounded text-sm font-medium text-white transition-opacity hover:opacity-90" 
+                  style={{ backgroundColor: '#8fbc8f' }}
+                >
+                  Partners
+                </a>
+                <a 
+                  href="/members" 
+                  className="px-3 py-1.5 rounded text-sm font-medium text-white transition-opacity hover:opacity-90" 
+                  style={{ backgroundColor: '#8fbc8f' }}
+                >
+                  View Community
+                </a>
+                <a 
+                  href="/policies" 
+                  className="px-3 py-1.5 rounded text-sm font-medium text-white transition-opacity hover:opacity-90" 
+                  style={{ backgroundColor: '#8fbc8f' }}
+                >
+                  Policies
+                </a>
+              </div>
             </div>
           </div>
 
@@ -181,9 +211,9 @@ export default function Footer() {
             )}
 
             <div className="flex flex-col gap-2">
-              <a href="/apply/staff"     className="bg-blue-600   text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700   transition-colors text-center">Become a Staff Member</a>
-              <a href="/apply/volunteer" className="bg-green-600  text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700  transition-colors text-center">Become a Volunteer</a>
-              <a href="/apply/partner"   className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition-colors text-center">Become a Partner</a>
+              <a href="/apply/staff"     className="bg-[#8fbc8f] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity text-center">Become a Staff Member</a>
+              <a href="/apply/volunteer" className="bg-[#8fbc8f] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity text-center">Become a Volunteer</a>
+              <a href="/apply/partner"   className="bg-[#8fbc8f] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity text-center">Become a Partner</a>
             </div>
           </div>
 

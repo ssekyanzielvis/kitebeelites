@@ -8,8 +8,8 @@ import HelloSlides from '@/components/HelloSlides';
 import ImageCard from '@/components/ImageCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { supabase } from '@/lib/supabase/client';
-import { ArrowRight } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { ArrowRight, Heart } from 'lucide-react';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 
 interface AboutContent {
   id: string;
@@ -65,8 +65,27 @@ interface GalleryImage {
   description: string | null;
 }
 
+interface ActiveSponsor {
+  id: string;
+  full_name: string;
+  logo_url: string | null;
+  message: string | null;
+  amount_or_item: string;
+  programs: {
+    title: string;
+  };
+}
+
+interface FeaturedGraduate {
+  id: string;
+  full_name: string;
+  profile_image_url: string | null;
+  course: string;
+  graduation_year: number;
+}
+
 export default function HomePage() {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [loading, setLoading] = useState(true);
   const [about, setAbout] = useState<AboutContent[]>([]);
   const [vision, setVision] = useState<VisionMission | null>(null);
@@ -77,6 +96,8 @@ export default function HomePage() {
   const [coreValues, setCoreValues] = useState<CoreValue[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [activeSponsors, setActiveSponsors] = useState<ActiveSponsor[]>([]);
+  const [featuredGraduates, setFeaturedGraduates] = useState<FeaturedGraduate[]>([]);
 
   useEffect(() => {
     fetchHomeData();
@@ -94,16 +115,31 @@ export default function HomePage() {
         coreValuesData,
         newsData,
         galleryData,
+        sponsorsData,
+        graduatesData,
       ] = await Promise.all([
         (supabase.from('about_us') as any).select('*').eq('is_active', true).limit(1),
         (supabase.from('vision') as any).select('*').eq('is_active', true).single(),
         (supabase.from('mission') as any).select('*').eq('is_active', true).single(),
         (supabase.from('objectives') as any).select('*').eq('is_active', true).order('order_index').limit(3),
-        (supabase.from('programs') as any).select('*').eq('is_active', true).eq('is_featured', true).limit(3),
+        (supabase.from('programs') as any).select('*').eq('is_active', true).eq('is_featured', true).limit(2),
         (supabase.from('achievements') as any).select('*').eq('is_active', true).eq('is_featured', true).limit(3),
         (supabase.from('core_values') as any).select('*').eq('is_active', true).eq('is_featured', true).limit(3),
         (supabase.from('news') as any).select('*').eq('is_active', true).eq('is_featured', true).order('published_date', { ascending: false }).limit(3),
         (supabase.from('gallery') as any).select('*').eq('is_active', true).eq('is_featured', true).limit(6),
+        (supabase.from('program_sponsorships') as any).select(`
+          id,
+          full_name,
+          logo_url,
+          message,
+          amount_or_item,
+          programs!inner (
+            title,
+            is_active,
+            end_date
+          )
+        `).eq('status', 'approved'),
+        (supabase.from('graduates') as any).select('id, full_name, profile_image_url, course, graduation_year').eq('is_active', true).eq('is_featured', true).order('graduation_year', { ascending: false }).limit(4)
       ]);
 
       setAbout(aboutData.data || []);
@@ -115,6 +151,24 @@ export default function HomePage() {
       setCoreValues(coreValuesData.data || []);
       setNews(newsData.data || []);
       setGallery(galleryData.data || []);
+      setFeaturedGraduates(graduatesData.data || []);
+      
+      // Filter active sponsors
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const validSponsors = (sponsorsData?.data || []).filter((sponsor: any) => {
+        const program = sponsor.programs;
+        if (!program || !program.is_active) return false;
+        if (program.end_date) {
+          const endDate = new Date(program.end_date);
+          if (endDate < today) return false;
+        }
+        return true;
+      });
+
+      setActiveSponsors(validSponsors);
+
     } catch (error) {
       console.error('Error fetching home data:', error);
     } finally {
@@ -258,15 +312,17 @@ export default function HomePage() {
                 />
               ))}
             </div>
-            <div className="text-center">
-              <Link
-                href="/programs"
-                className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
-                style={{ backgroundColor: theme.primaryColor }}
-              >
-                View All Programs <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-            </div>
+            {programs.length >= 2 && (
+              <div className="text-center">
+                <Link
+                  href="/programs"
+                  className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                  style={{ backgroundColor: theme.primaryColor }}
+                >
+                  View All Programs <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -385,6 +441,115 @@ export default function HomePage() {
                 style={{ backgroundColor: theme.primaryColor }}
               >
                 View All News <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Featured Graduates Section */}
+      {featuredGraduates.length > 0 && (
+        <section className="py-16 px-4">
+          <div className="container mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Featured Graduates</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-8">
+              {featuredGraduates.map((graduate) => (
+                <div key={graduate.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden group">
+                  <div className="relative w-full aspect-[4/5] overflow-hidden">
+                    {graduate.profile_image_url ? (
+                      <MediaRenderer src={graduate.profile_image_url} alt={graduate.full_name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                        <span className="text-6xl text-gray-400 font-bold">{graduate.full_name.charAt(0)}</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90" />
+                    <div className="absolute bottom-0 left-0 w-full p-5 text-white">
+                      <h3 className="text-xl font-bold mb-1 line-clamp-1">{graduate.full_name}</h3>
+                      <p className="text-white/90 font-medium text-xs mb-1">Class of {graduate.graduation_year}</p>
+                      <p className="text-gray-300 text-xs line-clamp-2">{graduate.course}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {featuredGraduates.length >= 3 && (
+              <div className="text-center">
+                <Link
+                  href="/graduates"
+                  className="inline-flex items-center text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold"
+                  style={{ backgroundColor: theme.primaryColor }}
+                >
+                  View All Graduates <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Sponsors Section */}
+      {activeSponsors.length > 0 && (
+        <section className="py-16 px-4 bg-gradient-to-br from-white via-gray-50 to-gray-100 border-t border-gray-200">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center p-3 rounded-full mb-4" style={{ backgroundColor: `${theme.primaryColor}20` }}>
+                <Heart className="w-8 h-8 fill-current" style={{ color: theme.primaryColor }} />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Generous Sponsors</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+                We extend our deepest gratitude to the incredible businesses and individuals making our programs possible.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {activeSponsors.map((sponsor) => (
+                <div key={sponsor.id} className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 group relative overflow-hidden flex flex-col h-full">
+                  <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: theme.primaryColor }} />
+                  
+                  <div className="flex items-start gap-4 mb-4">
+                    {sponsor.logo_url ? (
+                      <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-gray-100 p-2 bg-white flex items-center justify-center shadow-sm">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={sponsor.logo_url} alt={sponsor.full_name} className="w-full h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center shadow-sm">
+                        <span className="text-gray-400 font-bold text-xl">{sponsor.full_name.charAt(0)}</span>
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-900 mb-1 line-clamp-2">{sponsor.full_name}</h3>
+                      <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: `${theme.primaryColor}15`, color: theme.primaryColor }}>
+                        {sponsor.programs.title}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1">
+                    {sponsor.message && (
+                      <div className="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-600 italic border-l-4" style={{ borderColor: theme.primaryColor }}>
+                        "{sponsor.message}"
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="pt-4 mt-auto border-t border-gray-100">
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Contribution</p>
+                    <p className="font-semibold text-gray-800">{sponsor.amount_or_item}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Link
+                href="/programs"
+                className="inline-flex items-center text-white px-8 py-4 rounded-xl hover:opacity-90 transition-all font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                style={{ backgroundColor: theme.primaryColor }}
+              >
+                Join them and Sponsor a Program! <ArrowRight className="ml-2 w-6 h-6" />
               </Link>
             </div>
           </div>

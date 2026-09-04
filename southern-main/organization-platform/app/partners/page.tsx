@@ -10,6 +10,8 @@ interface Partner {
   id: string;
   full_name: string;
   organization_name: string;
+  business_name?: string;
+  logo_url?: string;
   offer: string;
   email: string;
   nationality: string;
@@ -45,12 +47,18 @@ export default function PartnersPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {partners.map((partner) => (
-              <div key={partner.id} className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-2">{partner.full_name}</h2>
-                <p className="text-sm text-gray-700 mb-1">Organisation: {partner.organization_name}</p>
-                <p className="text-sm text-gray-700 mb-1">What to Offer: {partner.offer}</p>
-                <p className="text-sm text-gray-700 mb-1">Email: {partner.email}</p>
-                <p className="text-sm text-gray-700 mb-1">Nationality: {partner.nationality}</p>
+              <div key={partner.id} className="bg-white rounded-lg shadow p-6 flex flex-col sm:flex-row gap-4 items-start">
+                {partner.logo_url && (
+                  <div className="w-24 h-24 flex-shrink-0">
+                    <img src={partner.logo_url} alt={partner.business_name || partner.organization_name} className="w-full h-full object-contain rounded" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold mb-2">{partner.business_name || partner.organization_name}</h2>
+                  <p className="text-sm text-gray-700 mb-1"><span className="font-medium">Contact:</span> {partner.full_name}</p>
+                  <p className="text-sm text-gray-700 mb-1"><span className="font-medium">What to Offer:</span> {partner.offer}</p>
+                  <p className="text-sm text-gray-700 mb-1"><span className="font-medium">Nationality:</span> {partner.nationality}</p>
+                </div>
               </div>
             ))}
           </div>

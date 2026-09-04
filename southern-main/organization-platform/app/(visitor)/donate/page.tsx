@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CreditCard, Smartphone, DollarSign } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { formatCurrency, generateReceiptNumber } from '@/lib/utils';
 
@@ -58,7 +58,7 @@ interface DonationInsert {
 }
 
 export default function DonatePage() {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [submitting, setSubmitting] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [transactionReference, setTransactionReference] = useState<string | null>(null);

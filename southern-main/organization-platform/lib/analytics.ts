@@ -66,10 +66,17 @@ export async function trackAnalytics(
     const { error } = await (supabase.from('analytics') as any).insert([analyticsData]);
 
     if (error) {
-      console.error('Analytics tracking error:', error);
+      // Often {} is logged if the error is a blocked network request (e.g., Adblocker)
+      // or if it lacks enumerable properties. 
+      const errorMessage = error.message || error.details || JSON.stringify(error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking warning (often due to AdBlockers):', errorMessage === '{}' ? 'Blocked by client' : errorMessage);
+      }
     }
-  } catch (error) {
-    console.error('Failed to track analytics:', error);
+  } catch (error: any) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Failed to track analytics:', error.message || error);
+    }
   }
 }
 

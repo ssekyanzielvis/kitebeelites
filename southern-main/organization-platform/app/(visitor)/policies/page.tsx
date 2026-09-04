@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Shield, ChevronDown, ChevronUp, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 
 interface Policy {
   id: string;
@@ -13,7 +13,7 @@ interface Policy {
 }
 
 export default function PoliciesPage() {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);

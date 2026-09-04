@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Users, UserCheck, UserPlus, Search, Loader2 } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 
 interface CommunityMember {
   id: string;
@@ -15,7 +15,7 @@ interface CommunityMember {
 }
 
 export default function MembersPage() {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [members, setMembers] = useState<CommunityMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { adminDb } from '@/lib/supabase/adminDb';
-import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff, Download, PlusCircle, MinusCircle } from 'lucide-react';
+import { downloadBudgetPDF } from '@/lib/utils/pdfGenerator';
 import MediaRenderer from '@/components/MediaRenderer';
 import MediaPreviewModal from '@/components/MediaPreviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -25,9 +26,32 @@ export default function ProgramsManagement() {
     title: '',
     description: '',
     image_url: '',
+    start_date: '',
+    end_date: '',
+    budget_items: [] as { item: string; cost: number }[],
     is_active: true,
     is_featured: false,
   });
+
+  const addBudgetItem = () => {
+    setFormData({
+      ...formData,
+      budget_items: [...formData.budget_items, { item: '', cost: 0 }]
+    });
+  };
+
+  const updateBudgetItem = (index: number, field: 'item' | 'cost', value: string | number) => {
+    const newItems = [...formData.budget_items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    setFormData({ ...formData, budget_items: newItems });
+  };
+
+  const removeBudgetItem = (index: number) => {
+    const newItems = formData.budget_items.filter((_, i) => i !== index);
+    setFormData({ ...formData, budget_items: newItems });
+  };
+
+  const totalBudget = formData.budget_items.reduce((acc, curr) => acc + (Number(curr.cost) || 0), 0);
 
   useEffect(() => {
     fetchPrograms();
@@ -54,16 +78,23 @@ export default function ProgramsManagement() {
     setLoading(true);
 
     try {
+      // Clean dates if empty string
+      const dataToSave = {
+        ...formData,
+        start_date: formData.start_date || null,
+        end_date: formData.end_date || null,
+      };
+
       if (editingProgram) {
         const { error } = await adminDb('programs').update({
-            ...formData,
+            ...dataToSave,
             updated_at: new Date().toISOString(),
           }).eq('id', editingProgram.id);
 
         if (error) throw error;
         showNotification('Program updated successfully', 'success');
       } else {
-        const { error } = await adminDb('programs').insert(formData);
+        const { error } = await adminDb('programs').insert(dataToSave);
 
         if (error) throw error;
         showNotification('Program created successfully', 'success');
@@ -97,6 +128,9 @@ export default function ProgramsManagement() {
       title: '',
       description: '',
       image_url: '',
+      start_date: '',
+      end_date: '',
+      budget_items: [],
       is_active: true,
       is_featured: false,
     });
@@ -110,6 +144,9 @@ export default function ProgramsManagement() {
       title: program.title,
       description: program.description || '',
       image_url: program.image_url || '',
+      start_date: program.start_date || '',
+      end_date: program.end_date || '',
+      budget_items: program.budget_items || [],
       is_active: program.is_active,
       is_featured: program.is_featured,
     });
@@ -156,6 +193,14 @@ export default function ProgramsManagement() {
                 </div>
               </div>
               <p className="text-sm text-gray-600 mb-4 line-clamp-3">{program.description}</p>
+              {program.budget_items && program.budget_items.length > 0 && (
+                <button
+                  onClick={() => downloadBudgetPDF(program.title, program.budget_items)}
+                  className="w-full mb-4 flex items-center justify-center gap-2 bg-green-50 text-green-700 py-2 rounded-lg hover:bg-green-100 text-sm font-medium transition-colors"
+                >
+                  <Download className="w-4 h-4" /> Download Budget PDF
+                </button>
+              )}
               <div className="flex gap-2">
                 <button
                   onClick={() => openEditModal(program)}
@@ -207,6 +252,82 @@ export default function ProgramsManagement() {
                   className="w-full border rounded-lg px-3 py-2"
                   rows={4}
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    className="w-full border rounded-lg px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">End Date</label>
+                  <input
+                    type="date"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                    className="w-full border rounded-lg px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              {/* Budget Builder */}
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold text-gray-700">Estimated Budget (UGX)</h3>
+                  <button
+                    type="button"
+                    onClick={addBudgetItem}
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    <PlusCircle className="w-4 h-4" /> Add Item
+                  </button>
+                </div>
+                
+                <div className="space-y-3">
+                  {formData.budget_items.map((item, idx) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          placeholder="Item Description"
+                          value={item.item}
+                          onChange={(e) => updateBudgetItem(idx, 'item', e.target.value)}
+                          className="w-full border rounded px-2 py-1 text-sm"
+                        />
+                      </div>
+                      <div className="w-1/3">
+                        <input
+                          type="number"
+                          placeholder="Cost"
+                          value={item.cost || ''}
+                          onChange={(e) => updateBudgetItem(idx, 'cost', Number(e.target.value))}
+                          className="w-full border rounded px-2 py-1 text-sm"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeBudgetItem(idx)}
+                        className="text-red-500 hover:text-red-700 p-1"
+                      >
+                        <MinusCircle className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+                  {formData.budget_items.length === 0 && (
+                    <p className="text-sm text-gray-500 italic text-center py-2">No budget items added. Click "Add Item" to draft a budget.</p>
+                  )}
+                  {formData.budget_items.length > 0 && (
+                    <div className="flex justify-between items-center pt-3 border-t mt-3">
+                      <span className="font-semibold text-gray-700">Total:</span>
+                      <span className="font-bold text-blue-700">UGX {totalBudget.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
               </div>
               <FileUpload
                 bucket="programs"

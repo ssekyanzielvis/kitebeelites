@@ -116,3 +116,28 @@ export const useTheme = () => {
   const setTheme = useAppStore((state) => state.setTheme);
   return { theme, setTheme };
 };
+
+// Use this hook in components that use the theme to prevent hydration errors.
+// It will return a default theme during SSR and the first client render,
+// then switch to the persisted/fetched theme after mounting.
+import { useState, useEffect } from 'react';
+
+export const useHydratedTheme = () => {
+  const theme = useAppStore((state) => state.theme);
+  const setTheme = useAppStore((state) => state.setTheme);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const currentTheme = mounted ? theme : {
+    backgroundColor: '#FFFFFF',
+    textColor: '#000000',
+    primaryColor: '#0000FF',
+    fontFamily: 'Inter',
+  };
+
+  return { theme: currentTheme, setTheme };
+};
+

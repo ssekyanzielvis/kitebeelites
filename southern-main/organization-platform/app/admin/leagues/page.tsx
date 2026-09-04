@@ -65,9 +65,18 @@ export default function LeaguesManagement() {
     setLoading(true);
 
     try {
-      // Auto-generate slug if empty
-      const currentSlug = formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const dataToSave = { ...formData, slug: currentSlug };
+      // Auto-generate slug if empty, and add a timestamp to ensure uniqueness
+      const currentSlug = formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '-' + Date.now();
+      
+      const defaultLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || 'League')}&background=random&size=200`;
+      const defaultCover = 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=2000&auto=format&fit=crop';
+      
+      const dataToSave = { 
+        ...formData, 
+        slug: currentSlug,
+        logo_url: formData.logo_url || defaultLogo,
+        cover_url: formData.cover_url || defaultCover,
+      };
 
       if (editingLeague) {
         const { error } = await adminDb('leagues').update({
@@ -167,7 +176,29 @@ export default function LeaguesManagement() {
           <p className="text-gray-600">Create and manage your sports leagues.</p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setFormData({
+              name: '',
+              short_name: '',
+              slug: '',
+              description: '',
+              sport: '',
+              competition_type: '',
+              season: '',
+              gender: '',
+              age_category: '',
+              location: '',
+              venue: '',
+              organizer: '',
+              cover_url: '',
+              logo_url: '',
+              status: 'Upcoming',
+              is_active: false,
+              is_featured: false,
+            });
+            setEditingLeague(null);
+            setIsModalOpen(true);
+          }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
         >
           <Plus className="w-5 h-5" />

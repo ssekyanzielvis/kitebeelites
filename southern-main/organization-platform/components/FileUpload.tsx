@@ -29,9 +29,13 @@ export default function FileUpload({
   const { showNotification } = useNotification();
 
   const getAcceptString = () => {
-    if (accept === 'image') return 'image/*';
-    if (accept === 'video') return 'video/*';
-    return 'image/*,video/*';
+    // Using specific extensions instead of wildcards (image/*, video/*) 
+    // prevents the Windows File Explorer "Not Responding" freeze bug.
+    const imageTypes = '.jpg,.jpeg,.png,.gif,.webp';
+    const videoTypes = '.mp4,.webm,.ogg';
+    if (accept === 'image') return imageTypes;
+    if (accept === 'video') return videoTypes;
+    return `${imageTypes},${videoTypes}`;
   };
 
   const isValidFileType = (file: File): boolean => {
@@ -69,9 +73,11 @@ export default function FileUpload({
     setFileType(getFileType(file));
 
     // Show local preview immediately
-    const reader = new FileReader();
-    reader.onloadend = () => setPreview(reader.result as string);
-    reader.readAsDataURL(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    // Clean up the object URL after upload completes to prevent memory leaks
+    // However, since we might still be showing it during upload, we wait until upload is done.
 
     await uploadFile(file);
   };

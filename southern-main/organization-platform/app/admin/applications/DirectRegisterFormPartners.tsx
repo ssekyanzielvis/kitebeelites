@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 
+import FileUpload from "@/components/FileUpload";
+
 export default function DirectRegisterFormPartners({ onRegister }: { onRegister: (data: any) => void }) {
   const [fields, setFields] = useState<any>({});
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFields({ ...fields, [e.target.name]: e.target.value });
+  };
+
+  const handleUploadComplete = (url: string) => {
+    setFields({ ...fields, logo_url: url });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,9 +28,20 @@ export default function DirectRegisterFormPartners({ onRegister }: { onRegister:
     <form onSubmit={handleSubmit} className="space-y-3">
       <input name="full_name" placeholder="Contact Person" value={fields.full_name || ""} onChange={handleChange} required className="w-full border rounded px-3 py-2" />
       <input name="organization_name" placeholder="Organization Name" value={fields.organization_name || ""} onChange={handleChange} required className="w-full border rounded px-3 py-2" />
+      <input name="business_name" placeholder="Business Name" value={fields.business_name || ""} onChange={handleChange} required className="w-full border rounded px-3 py-2" />
       <textarea name="offer" placeholder="What to Offer" value={fields.offer || ""} onChange={handleChange} required className="w-full border rounded px-3 py-2" />
       <input name="email" type="email" placeholder="Email" value={fields.email || ""} onChange={handleChange} required className="w-full border rounded px-3 py-2" />
       <input name="nationality" placeholder="Nationality" value={fields.nationality || ""} onChange={handleChange} required className="w-full border rounded px-3 py-2" />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Partner Logo (Optional)</label>
+        <FileUpload
+          bucket="partner-logos"
+          onUploadComplete={handleUploadComplete}
+          currentUrl={fields.logo_url}
+          accept="image"
+          label="Upload Logo"
+        />
+      </div>
       <button type="submit" disabled={submitting} className="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors">{submitting ? "Registering..." : "Register Directly"}</button>
     </form>
   );

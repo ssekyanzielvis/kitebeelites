@@ -4,13 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { useHydratedTheme } from '@/lib/store';
 import { supabase } from '@/lib/supabase/client';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [orgName, setOrgName] = useState('Kitebe Elites FC');
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
 
   useEffect(() => {
     let mounted = true;
@@ -55,6 +55,8 @@ export default function Header() {
         { href: '/achievements', label: 'Achievements' },
         { href: '/gallery', label: 'Gallery' },
         { href: '/news', label: 'News' },
+        { href: '/know-your-player', label: 'Know Your Player' },
+        { href: '/graduates', label: 'Kitebe Graduates' },
       ]
     },
     { href: '/contact', label: 'Contact' },

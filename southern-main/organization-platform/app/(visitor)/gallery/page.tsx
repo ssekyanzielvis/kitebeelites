@@ -7,7 +7,7 @@ import {
   X, ChevronLeft, ChevronRight, ZoomIn, Play,
   Images, Loader2
 } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 
 interface GalleryItem {
   id: string;
@@ -19,7 +19,7 @@ interface GalleryItem {
 }
 
 export default function GalleryPage() {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [filtered, setFiltered] = useState<GalleryItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);

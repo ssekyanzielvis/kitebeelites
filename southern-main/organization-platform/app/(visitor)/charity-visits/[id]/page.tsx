@@ -8,12 +8,12 @@ import MediaRenderer from '@/components/MediaRenderer';
 import { MapPin, Calendar, CheckCircle, ArrowLeft, Heart, Target, DollarSign, Activity } from 'lucide-react';
 import Link from 'next/link';
 
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 
 type CharityVisit = Database['public']['Tables']['charity_visits']['Row'];
 
 export default function CharityVisitDetailsPage({ params }: { params: { id: string } }) {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [visit, setVisit] = useState<CharityVisit | null>(null);
   const [loading, setLoading] = useState(true);
 

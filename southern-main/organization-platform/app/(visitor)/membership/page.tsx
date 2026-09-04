@@ -7,7 +7,7 @@ import {
   GraduationCap, Heart, FileText, CheckSquare, Send, ArrowRight,
   ChevronDown, Loader2, CheckCircle2, AlertCircle
 } from 'lucide-react';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useHydratedTheme } from '@/lib/store';
 
 const EDUCATION_LEVELS = [
   'High School / O-Level',
@@ -53,7 +53,7 @@ const INITIAL: FormData = {
 };
 
 export default function MembershipPage() {
-  const theme = useAppStore((state) => state.theme);
+  const { theme } = useHydratedTheme();
   const [form, setForm] = useState<FormData>(INITIAL);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
